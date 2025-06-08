@@ -21,13 +21,13 @@ namespace Movies.Api.Controllers
         {
             var movie = request.MapToMovie();
             var created = await _movieRepository.CreateMovieAsync(movie);
-            return Created($"/{ApiEndPoints.Movies.Create}/{movie.Id}",movie);
+            return CreatedAtAction(nameof(Get), new { id = movie.Id }, movie);
         }
         [HttpGet(ApiEndPoints.Movies.Get)]
-        public async Task<IActionResult> GetByIdAsync([FromRoute] Guid id)
+        public async Task<IActionResult> Get([FromRoute] Guid id)
         {
             var movie = await _movieRepository.GetMovieByIdAsync(id);
-            if(movie is null)
+            if (movie is null)
             {
                 return NotFound();
             }
@@ -39,6 +39,29 @@ namespace Movies.Api.Controllers
         {
             var movies = await _movieRepository.GetAllMoviesAsync();
             return Ok(movies.Select(m => m.MapToResponse()));
+        }
+        [HttpPut(ApiEndPoints.Movies.Update)]
+        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateMovieRequest request)
+        {
+            var movie = request.MapToMovie(id);
+            var updated = await _movieRepository.UpdateMovieAsync(movie);
+            if (!updated)
+            {
+                return NotFound();
+            }
+            var response = movie.MapToResponse();
+            return Ok(response);
+        }
+
+        [HttpDelete(ApiEndPoints.Movies.Delete)]
+        public async Task<IActionResult> Delete([FromRoute] Guid id)
+        {
+            var deleted = await _movieRepository.DeleteMovieAsync(id);
+            if (!deleted)
+            {
+                return NotFound();
+            }
+            return Ok();
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Movies.Application.Models
 {
     public class Movie
     {
-        public Guid Id { get; init; } = Guid.NewGuid();
+        public Guid Id { get; init; }
         public required string Title { get; init; }
         public required int YearOfRelease { get; init; }
 
