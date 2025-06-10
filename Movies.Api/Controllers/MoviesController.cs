@@ -18,10 +18,10 @@ namespace Movies.Api.Controllers
             _movieService = movieService;
         }
         [HttpPost(ApiEndPoints.Movies.Create)]
-        public async Task<IActionResult> Create([FromBody] CreateMovieRequest request)
+        public async Task<IActionResult> Create([FromBody] CreateMovieRequest request, CancellationToken token)
         {
             var movie = request.MapToMovie();
-            var created = await _movieService.CreateAsync(movie);
+            var created = await _movieService.CreateAsync(movie, token);
             return CreatedAtAction(nameof(Get), new { idOrSlug = movie.Id }, movie);
         }
         [HttpGet(ApiEndPoints.Movies.Get)]
@@ -39,17 +39,17 @@ namespace Movies.Api.Controllers
         }
 
         [HttpGet(ApiEndPoints.Movies.GetAll)]
-        public async Task<IActionResult> GetAllAsync()
+        public async Task<IActionResult> GetAllAsync(CancellationToken token)
         {
-            var movies = await _movieService.GetAllAsync();
+            var movies = await _movieService.GetAllAsync(token);
             var moviesResposne = movies.MapToResponse();
             return Ok(moviesResposne);
         }
         [HttpPut(ApiEndPoints.Movies.Update)]
-        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateMovieRequest request)
+        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateMovieRequest request, CancellationToken token)
         {
             var movie = request.MapToMovie(id);
-            var updated = await _movieService.UpdateAsync(movie);
+            var updated = await _movieService.UpdateAsync(movie, token);
             if (!updated)
             {
                 return NotFound();
@@ -59,9 +59,9 @@ namespace Movies.Api.Controllers
         }
 
         [HttpDelete(ApiEndPoints.Movies.Delete)]
-        public async Task<IActionResult> Delete([FromRoute] Guid id)
+        public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken tokenn)
         {
-            var deleted = await _movieService.DeleteAsync(id);
+            var deleted = await _movieService.DeleteAsync(id, token);
             if (!deleted)
             {
                 return NotFound();
