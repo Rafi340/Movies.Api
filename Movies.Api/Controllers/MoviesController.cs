@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Movies.Api.Mapping;
 using Movies.Application.Models;
 using Movies.Application.Repositories;
@@ -38,6 +39,7 @@ namespace Movies.Api.Controllers
             return Ok(movie.MapToResponse());
         }
 
+        [EnableRateLimiting("sliding")]
         [HttpGet(ApiEndPoints.Movies.GetAll)]
         public async Task<IActionResult> GetAllAsync(CancellationToken token)
         {
@@ -59,7 +61,7 @@ namespace Movies.Api.Controllers
         }
 
         [HttpDelete(ApiEndPoints.Movies.Delete)]
-        public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken tokenn)
+        public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken token)
         {
             var deleted = await _movieService.DeleteAsync(id, token);
             if (!deleted)
