@@ -1,6 +1,6 @@
 # 🎬 MovieRestApi
 
-A full-featured, modular REST API for movie management, built with **ASP.NET Core** and following best practices like clean architecture, modular structure, and robust authentication.
+A full-featured, modular REST API for movie management, built with **ASP.NET Core** and following best practices like modular structure, and robust authentication.
 
 ---
 ## 🔧 Features
