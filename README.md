@@ -1,40 +1,52 @@
-🎬 MovieRestApi
-A full-featured REST API for movie management built with ASP.NET Core.
+# 🎬 MovieRestApi
 
-🔧 Features
-✅ CRUD operations for movies
-🗄️ PostgreSQL integration with Dapper
-🔐 JWT-based authentication & authorization
-⭐ Movie ratings
-🔍 Advanced features: filtering, pagination, caching
-📦 SDK using Refit
-🔻 Minimal API version available
+A full-featured, modular REST API for movie management, built with **ASP.NET Core** and following best practices like clean architecture, modular structure, and robust authentication.
 
+---
+## 🔧 Features
 
-🚀 Getting Started
+- ✅ **CRUD operations** for movies  
+- 🗄️ **PostgreSQL** integration with Dapper  
+- 🔐 **JWT-based** authentication & authorization  
+- ⭐ **User ratings** for movies  
+- 🔍 **Advanced features**: filtering, pagination, caching  
+- 📦 **Refit-based SDK** client  
+- 🔻 **Minimal API** version supported  
 
-Prerequisites
-.NET 9 SDK
-Docker
+---
 
-# Clone the repo
-git clone [https://github.com/Rafi340/Movies.Api.git]
+## 🚀 Getting Started
 
-# Start PostgreSQL via Docker
+### ✅ Prerequisites
+
+- [.NET 9 SDK](https://dotnet.microsoft.com/)
+- [Docker](https://www.docker.com/)
+
+---
+
+### 🛠️ Installation & Run
+
+```bash
+# Clone the repository
+git clone https://github.com/Rafi340/Movies.Api.git
+cd Movies.Api
+
+# Start PostgreSQL using Docker
 docker compose up -d
 
-# Restore and run the API
+# Restore dependencies
 dotnet restore
+
+# Run the application
 dotnet run
-Access the API at:
-🌐 https://localhost:5001 or http://localhost:5000
 
-🧪 API Testing
-Use the included MovieRestApi.postman_collection file:
+🌐 Access the API at:
+https://localhost:5001
+http://localhost:5000
 
-Open Postman → Import
-
-Select the .postman_collection file from the repo
-
-Explore requests organized by feature
-
+🧪 API Testing with Postman
+### **This project includes a Postman collection to simplify testing:**
+ - Open Postman
+ - Click Import
+ - Select the MovieRestApi.postman_collection.json file from the repo
+ - Explore all endpoints organized by feature
