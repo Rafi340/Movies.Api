@@ -46,6 +46,7 @@ namespace Movies.Api.Controllers
 
         [EnableRateLimiting("sliding")]
         [HttpGet(ApiEndPoints.Movies.GetAll)]
+        [Authorize(AuthConstants.TrustedMemberPolicyName)]
         public async Task<IActionResult> GetAllAsync(CancellationToken token)
         {
             var userId = HttpContext.GetUserId();
