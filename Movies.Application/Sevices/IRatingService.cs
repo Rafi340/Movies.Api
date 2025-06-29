@@ -4,14 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Movies.Application.Repositories
+namespace Movies.Application.Sevices
 {
-    public interface IRatingRepository
+    public interface IRatingService
     {
-        Task<float?> GetRatingAsync(Guid movieId, CancellationToken token);
-        Task<(float? Rating, int? Userrating)> GetUserRatingAsync(Guid? movieId, Guid? userId, CancellationToken token);
         Task<bool> RateMovieAsync(Guid movieId, int rating, Guid userId, CancellationToken token = default);
         Task<bool> DeleteRatingAsync(Guid movieId, Guid userId, CancellationToken token = default);
-
     }
 }
