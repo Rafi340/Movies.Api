@@ -58,8 +58,9 @@ namespace Movies.Api.Controllers
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateMovieRequest request, CancellationToken token)
         {
             var movie = request.MapToMovie(id);
-            var updated = await _movieService.UpdateAsync(movie, token);
-            if (!updated)
+            var userId = HttpContext.GetUserId();
+            var updated = await _movieService.UpdateAsync(movie,userId, token);
+            if (updated == null)
             {
                 return NotFound();
             }

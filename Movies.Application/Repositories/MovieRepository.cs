@@ -76,7 +76,7 @@ namespace Movies.Application.Repositories
                 letf join ratings myr on m.id = myr.movieid
                 and myr.userid = @userId
                 group by m.id
-                """, cancellationToken: token));
+                """,new { userId } ,cancellationToken: token));
             return result.Select(x => new Movie
             {
                 Id=x.id,

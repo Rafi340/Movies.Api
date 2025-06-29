@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Movies.Api;
+using Movies.Api.Auth;
 using Movies.Api.Mapping;
 using Movies.Application;
 using Movies.Application.Database;
 using System.IdentityModel.Tokens.Jwt;
+using System.Threading.RateLimiting;
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 
