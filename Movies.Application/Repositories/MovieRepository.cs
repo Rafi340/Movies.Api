@@ -73,10 +73,10 @@ namespace Movies.Application.Repositories
                 from movies m
                 left join genres g on m.id = g.movieId
                 left join ratings r on m.id = r.movieid
-                letf join ratings myr on m.id = myr.movieid
+                left join ratings myr on m.id = myr.movieid
                 and myr.userid = @userId
-                group by m.id
-                """,new { userId } ,cancellationToken: token));
+                group by m.id , myr.rating
+                """, new { userId } ,cancellationToken: token));
             return result.Select(x => new Movie
             {
                 Id=x.id,
