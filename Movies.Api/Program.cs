@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Movies.Api;
+using Movies.Api.Auth;
 using Movies.Api.Mapping;
 using Movies.Application;
 using Movies.Application.Database;
 using System.IdentityModel.Tokens.Jwt;
+using System.Threading.RateLimiting;
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 
@@ -40,6 +43,25 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddApplication();
 builder.Services.AddADatabase(config["Database:ConnectionString"]!);
+
+builder.Services.AddRateLimiter(rateLimiterOptions =>
+{
+    rateLimiterOptions.OnRejected = async (context, token) =>
+    {
+        Console.WriteLine("?? Request rejected: Too Many Requests");
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        await context.HttpContext.Response.WriteAsync("Too many requests. Please try again later.", token);
+    };
+    rateLimiterOptions.AddSlidingWindowLimiter("sliding", options =>
+        {
+            options.PermitLimit = 10;
+            options.Window = TimeSpan.FromSeconds(10);
+            options.SegmentsPerWindow = 2;
+            options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+            options.QueueLimit = 0;
+        });
+   
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -48,7 +70,8 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
     app.MapOpenApi();
 }
-
+app.UseRouting();
+app.UseRateLimiter();
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
@@ -57,6 +80,11 @@ app.UseMiddleware<ValidationMappingMiddleware>();
 app.MapControllers();
 
 var dbInitializer = app.Services.GetRequiredService<DbInitializer>();
+app.UseEndpoints( endpoints =>
+{
+    endpoints.MapControllers(); // Must be inside UseEndpoints
+});
+
 await dbInitializer.InitializeAsync();
 
 app.Run();

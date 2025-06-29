@@ -34,6 +34,8 @@ namespace Movies.Api.Mapping
                 Id = movie.Id,
                 Title = movie.Title,
                 Slug = movie.Slug,
+                Rating = movie.Rating,
+                UserRating = movie.UserRating,
                 YearOfRelease = movie.YearOfRelease,
                 Genres = movie.Genres.ToList()
 
@@ -45,6 +47,15 @@ namespace Movies.Api.Mapping
             {
                 Items = movies.Select(MapToResponse)
             };
+        }
+        public static IEnumerable<MovieRatingResponse> MapToResponse(this IEnumerable<MovieRating> ratings)
+        {
+            return ratings.Select(r => new MovieRatingResponse
+            {
+                MovieId = r.MovieId,
+                Rating = r.Rating,
+                Slug = r.Slug
+            });
         }
     }
 }

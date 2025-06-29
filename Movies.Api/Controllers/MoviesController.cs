@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using Movies.Api.Auth;
 using Movies.Api.Mapping;
 using Movies.Application.Models;
 using Movies.Application.Repositories;
@@ -28,11 +30,12 @@ namespace Movies.Api.Controllers
             return CreatedAtAction(nameof(Get), new { idOrSlug = movie.Id }, movie);
         }
         [HttpGet(ApiEndPoints.Movies.Get)]
-        public async Task<IActionResult> Get([FromRoute] string idOrSlug)
+        public async Task<IActionResult> Get([FromRoute] string idOrSlug, CancellationToken  token)
         {
+            var userId = HttpContext.GetUserId();
             var movie = Guid.TryParse(idOrSlug.ToString(), out var id) ?
-                await _movieService.GetByIdAsync(id) 
-                : await _movieService.GetBySlugAsync(idOrSlug);
+                await _movieService.GetByIdAsync(id, userId, token) 
+                : await _movieService.GetBySlugAsync(idOrSlug, userId, token);
 
             if (movie is null)
             {
@@ -41,10 +44,12 @@ namespace Movies.Api.Controllers
             return Ok(movie.MapToResponse());
         }
 
+        [EnableRateLimiting("sliding")]
         [HttpGet(ApiEndPoints.Movies.GetAll)]
         public async Task<IActionResult> GetAllAsync(CancellationToken token)
         {
-            var movies = await _movieService.GetAllAsync(token);
+            var userId = HttpContext.GetUserId();
+            var movies = await _movieService.GetAllAsync(userId,token);
             var moviesResposne = movies.MapToResponse();
             return Ok(moviesResposne);
         }
@@ -53,8 +58,9 @@ namespace Movies.Api.Controllers
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateMovieRequest request, CancellationToken token)
         {
             var movie = request.MapToMovie(id);
-            var updated = await _movieService.UpdateAsync(movie, token);
-            if (!updated)
+            var userId = HttpContext.GetUserId();
+            var updated = await _movieService.UpdateAsync(movie,userId, token);
+            if (updated == null)
             {
                 return NotFound();
             }
