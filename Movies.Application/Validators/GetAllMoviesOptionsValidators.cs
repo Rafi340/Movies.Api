@@ -12,7 +12,7 @@ namespace Movies.Application.Validators
     {
         private static readonly string[] AcceptableSortFields =
         {
-            "title", "YearOfRelease"
+            "title", "yearOfRelease"
         };
         public GetAllMoviesOptionsValidators()
         {
