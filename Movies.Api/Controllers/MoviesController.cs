@@ -47,10 +47,14 @@ namespace Movies.Api.Controllers
         [EnableRateLimiting("sliding")]
         [HttpGet(ApiEndPoints.Movies.GetAll)]
         [Authorize(AuthConstants.TrustedMemberPolicyName)]
-        public async Task<IActionResult> GetAllAsync(CancellationToken token)
+        public async Task<IActionResult> GetAllAsync(
+            [FromQuery] GetAllMoviesRequest request,
+            CancellationToken token)
         {
             var userId = HttpContext.GetUserId();
-            var movies = await _movieService.GetAllAsync(userId,token);
+            var options = request.MapToOptions()
+                .WithUser(userId);
+            var movies = await _movieService.GetAllAsync(options,token);
             var moviesResposne = movies.MapToResponse();
             return Ok(moviesResposne);
         }
