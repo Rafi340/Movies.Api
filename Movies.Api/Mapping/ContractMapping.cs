@@ -62,7 +62,7 @@ namespace Movies.Api.Mapping
             return new GetAllMoviesOptions
             {
                 Title = request.Title,
-                YearOfRelease = request.Year,
+                YearOfRelease = request.YearOfRelease,
                 SortField = request.SortBy?.Trim('+' , '-'),
                 SortOrder = request.SortBy is null ? SortOrder.Unsorted :
                                             request.SortBy.StartsWith('+') ? SortOrder.Ascending :
