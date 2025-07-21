@@ -8,6 +8,7 @@ using Movies.Application.Models;
 using Movies.Application.Repositories;
 using Movies.Application.Sevices;
 using Movies.Contracts.Requests;
+using Movies.Contracts.Responses;
 
 namespace Movies.Api.Controllers
 {
@@ -30,7 +31,9 @@ namespace Movies.Api.Controllers
             return CreatedAtAction(nameof(Get), new { idOrSlug = movie.Id }, movie);
         }
         [HttpGet(ApiEndPoints.Movies.Get)]
-        public async Task<IActionResult> Get([FromRoute] string idOrSlug, CancellationToken  token)
+        public async Task<IActionResult> Get([FromRoute] string idOrSlug,
+            [FromServices] LinkGenerator linkGenerator,
+            CancellationToken  token)
         {
             var userId = HttpContext.GetUserId();
             var movie = Guid.TryParse(idOrSlug.ToString(), out var id) ?
@@ -41,7 +44,27 @@ namespace Movies.Api.Controllers
             {
                 return NotFound();
             }
-            return Ok(movie.MapToResponse());
+            var reponse = movie.MapToResponse();
+            var movieObj = new {id = movie.Id};
+            reponse.Links.Add(new Link
+            {
+                Href = linkGenerator.GetPathByAction(HttpContext, nameof(Get), values: new {idOrSlug = movie.Id}),
+                Rel = "self",
+                Type = "GET"
+            });
+            reponse.Links.Add(new Link
+            {
+                Href = linkGenerator.GetPathByAction(HttpContext, nameof(Update), values: new { idOrSlug = movie.Id }),
+                Rel = "self",
+                Type = "PUT"
+            });
+            reponse.Links.Add(new Link
+            {
+                Href = linkGenerator.GetPathByAction(HttpContext, nameof(Delete), values: new { idOrSlug = movie.Id }),
+                Rel = "self",
+                Type = "DELETE"
+            });
+            return Ok(reponse);
         }
 
         [EnableRateLimiting("sliding")]
@@ -55,7 +78,8 @@ namespace Movies.Api.Controllers
             var options = request.MapToOptions()
                 .WithUser(userId);
             var movies = await _movieService.GetAllAsync(options,token);
-            var moviesResposne = movies.MapToResponse();
+            var count = await _movieService.GetCountAsync(options.Title, options.YearOfRelease, token);
+            var moviesResposne = movies.MapToResponse(request.Page, request.PageSize, count);
             return Ok(moviesResposne);
         }
         [HttpPut(ApiEndPoints.Movies.Update)]
