@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -12,7 +13,7 @@ using Movies.Contracts.Responses;
 
 namespace Movies.Api.Controllers
 {
-
+    [ApiVersion(1.0)]
     [ApiController]
     public class MoviesController : ControllerBase
     {
@@ -24,14 +25,18 @@ namespace Movies.Api.Controllers
         
         [HttpPost(ApiEndPoints.Movies.Create)]
         [Authorize(AuthConstants.TrustedMemberPolicyName)]
+        [ProducesResponseType(typeof(MovieResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ValidationFailureResponse),StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromBody] CreateMovieRequest request, CancellationToken token)
         {
             var movie = request.MapToMovie();
             var created = await _movieService.CreateAsync(movie, token);
-            return CreatedAtAction(nameof(Get), new { idOrSlug = movie.Id }, movie);
+            return CreatedAtAction(nameof(GetV1), new { idOrSlug = movie.Id }, movie);
         }
         [HttpGet(ApiEndPoints.Movies.Get)]
-        public async Task<IActionResult> Get([FromRoute] string idOrSlug,
+        [ProducesResponseType(typeof(MovieResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetV1([FromRoute] string idOrSlug,
             [FromServices] LinkGenerator linkGenerator,
             CancellationToken  token)
         {
@@ -48,7 +53,7 @@ namespace Movies.Api.Controllers
             var movieObj = new {id = movie.Id};
             reponse.Links.Add(new Link
             {
-                Href = linkGenerator.GetPathByAction(HttpContext, nameof(Get), values: new {idOrSlug = movie.Id}),
+                Href = linkGenerator.GetPathByAction(HttpContext, nameof(GetV1), values: new {idOrSlug = movie.Id}),
                 Rel = "self",
                 Type = "GET"
             });
@@ -67,9 +72,49 @@ namespace Movies.Api.Controllers
             return Ok(reponse);
         }
 
+        [HttpGet(ApiEndPoints.Movies.Get)]
+        public async Task<IActionResult> GetV2([FromRoute] string idOrSlug,
+            [FromServices] LinkGenerator linkGenerator,
+            CancellationToken token)
+        {
+            var userId = HttpContext.GetUserId();
+            var movie = Guid.TryParse(idOrSlug.ToString(), out var id) ?
+                await _movieService.GetByIdAsync(id, userId, token)
+                : await _movieService.GetBySlugAsync(idOrSlug, userId, token);
+
+            if (movie is null)
+            {
+                return NotFound();
+            }
+            var reponse = movie.MapToResponse();
+            var movieObj = new { id = movie.Id };
+            reponse.Links.Add(new Link
+            {
+                Href = linkGenerator.GetPathByAction(HttpContext, nameof(GetV1), values: new { idOrSlug = movie.Id }),
+                Rel = "self",
+                Type = "GET"
+            });
+            reponse.Links.Add(new Link
+            {
+                Href = linkGenerator.GetPathByAction(HttpContext, nameof(Update), values: new { idOrSlug = movie.Id }),
+                Rel = "self",
+                Type = "PUT"
+            });
+            reponse.Links.Add(new Link
+            {
+                Href = linkGenerator.GetPathByAction(HttpContext, nameof(Delete), values: new { idOrSlug = movie.Id }),
+                Rel = "self",
+                Type = "DELETE"
+            });
+            return Ok(reponse);
+        }
+
+
+
         [EnableRateLimiting("sliding")]
         [HttpGet(ApiEndPoints.Movies.GetAll)]
         [Authorize(AuthConstants.TrustedMemberPolicyName)]
+        [ProducesResponseType(typeof(MovieResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllAsync(
             [FromQuery] GetAllMoviesRequest request,
             CancellationToken token)
@@ -83,6 +128,9 @@ namespace Movies.Api.Controllers
             return Ok(moviesResposne);
         }
         [HttpPut(ApiEndPoints.Movies.Update)]
+        [ProducesResponseType(typeof(MovieResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ValidationFailureResponse),StatusCodes.Status400BadRequest)]
         [Authorize(AuthConstants.TrustedMemberPolicyName)]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateMovieRequest request, CancellationToken token)
         {
