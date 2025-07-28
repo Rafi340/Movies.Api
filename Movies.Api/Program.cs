@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Movies.Api;
 using Movies.Api.Auth;
+using Movies.Api.EndPoints;
 using Movies.Api.Health;
 using Movies.Api.Mapping;
 using Movies.Api.Swagger;
@@ -72,7 +73,7 @@ builder.Services.AddApiVersioning(x =>
     x.ApiVersionReader = new MediaTypeApiVersionReader("api-version");
 }).AddMvc().AddApiExplorer();
 
-builder.Services.AddControllers();
+//builder.Services.AddControllers();
 
 builder.Services.AddHealthChecks()
     .AddCheck<DatabaseHealthCheck>(DatabaseHealthCheck.Name);
@@ -136,8 +137,8 @@ app.UseAuthorization();
 //app.UseResponseCaching();
 app.UseOutputCache();
 app.UseMiddleware<ValidationMappingMiddleware>();
-app.MapControllers();
-
+//app.MapControllers();
+app.MapApiEndPoints();
 var dbInitializer = app.Services.GetRequiredService<DbInitializer>();
 app.UseEndpoints( endpoints =>
 {

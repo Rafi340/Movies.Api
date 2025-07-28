@@ -36,6 +36,7 @@ namespace Movies.Api.Controllers
             var movie = request.MapToMovie();
             await _movieService.CreateAsync(movie, token);
             await _outputCacheStore.EvictByTagAsync("movies", token);
+            var response = movie.MapToResponse();
             return CreatedAtAction(nameof(GetV1), new { idOrSlug = movie.Id }, movie);
         }
         [HttpGet(ApiEndPoints.Movies.Get)]
