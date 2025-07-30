@@ -117,8 +117,9 @@ namespace Movies.Api.Controllers
                 .WithUser(userId);
             var movies = await _movieService.GetAllAsync(options,token);
             var count = await _movieService.GetCountAsync(options.Title, options.YearOfRelease, token);
-            var moviesResposne = movies.MapToResponse(request.Page, request.PageSize, count);
-            return Ok(moviesResposne);
+            //var moviesResposne = movies.MapToResponse(request.Page, request.PageSize, count);
+            //return Ok(moviesResposne);
+            return Ok(movies);
         }
         [HttpPut(ApiEndPoints.Movies.Update)]
         [ProducesResponseType(typeof(MovieResponse), StatusCodes.Status200OK)]

@@ -73,8 +73,8 @@ namespace Movies.Api.Mapping
                                             request.SortBy.StartsWith('+') ? SortOrder.Ascending :
                             request.SortBy.StartsWith('-') ? SortOrder.Descending : SortOrder.Ascending
                             ,
-                Page = request.Page,
-                PageSize = request.PageSize
+                Page = request.Page.GetValueOrDefault(PagedRequest.DefaultPage),
+                PageSize = request.PageSize.GetValueOrDefault(PagedRequest.DefaultPage)
             };
         }
         public static GetAllMoviesOptions WithUser(this GetAllMoviesOptions options, Guid? userId)
