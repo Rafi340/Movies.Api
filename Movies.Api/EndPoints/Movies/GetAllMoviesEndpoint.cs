@@ -26,8 +26,32 @@ namespace Movies.Api.EndPoints.Movies
                 var moviesResposne = movies.MapToResponse(request.Page.GetValueOrDefault(PagedRequest.DefaultPage),
                     request.PageSize.GetValueOrDefault(PagedRequest.DefaultPageSize), count);
                 return TypedResults.Ok(moviesResposne);
-            }).WithName(Name)
-            .Produces<MoviesResponse>(StatusCodes.Status200OK);
+            }).WithName($"{Name}V1")
+            .Produces<MoviesResponse>(StatusCodes.Status200OK)
+            .WithApiVersionSet(ApiVersioning.VersionSet)
+            .HasApiVersion(1.0)
+            .RequireRateLimiting("sliding");
+
+            app.MapGet(ApiEndPoints.Movies.GetAll, async (
+                [AsParameters] GetAllMoviesRequest request,
+                IMovieService movieService,
+                HttpContext context,
+                CancellationToken token) =>
+            {
+                var userId = context.GetUserId();
+                var options = request.MapToOptions()
+                    .WithUser(userId);
+                var movies = await movieService.GetAllAsync(options, token);
+                var count = await movieService.GetCountAsync(options.Title, options.YearOfRelease, token);
+                var moviesResposne = movies.MapToResponse(request.Page.GetValueOrDefault(PagedRequest.DefaultPage),
+                    request.PageSize.GetValueOrDefault(PagedRequest.DefaultPageSize), count);
+                return TypedResults.Ok(moviesResposne);
+            }).WithName($"{Name}V2")
+            .Produces<MoviesResponse>(StatusCodes.Status200OK)
+            .WithApiVersionSet(ApiVersioning.VersionSet)
+            .HasApiVersion(2.0)
+            .CacheOutput("MovieCache")
+            .RequireRateLimiting("sliding");
             return app;
         }
     }
