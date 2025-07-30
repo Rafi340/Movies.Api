@@ -1,6 +1,7 @@
 ﻿using Movies.Api.Auth;
 using Movies.Api.Mapping;
 using Movies.Application.Sevices;
+using Movies.Contracts.Responses;
 
 namespace Movies.Api.EndPoints.Ratings
 {
@@ -17,7 +18,9 @@ namespace Movies.Api.EndPoints.Ratings
                     var ratings = await ratingService.GetRatingsForUserAsync(userId!.Value, token);
                     var ratingsReponse = ratings.MapToResponse();
                     return TypedResults.Ok(ratingsReponse);
-                }).WithName(Name).RequireAuthorization();
+                }).WithName(Name)
+                .Produces<IEnumerable<MovieRatingResponse>>(StatusCodes.Status200OK)
+                .RequireAuthorization();
             return app;
         }
     }

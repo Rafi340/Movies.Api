@@ -1,6 +1,7 @@
 ﻿using Movies.Api.Auth;
 using Movies.Api.Mapping;
 using Movies.Application.Sevices;
+using Movies.Contracts.Responses;
 
 namespace Movies.Api.EndPoints.Movies
 {
@@ -27,7 +28,9 @@ namespace Movies.Api.EndPoints.Movies
                 var movieObj = new { id = movie.Id };
 
                 return TypedResults.Ok(reponse);
-            }).WithName(Name);
+            }).WithName(Name)
+            .Produces<MovieResponse>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status404NotFound);
             return app;
         }
     }
