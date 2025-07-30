@@ -7,8 +7,9 @@
             app.MapGetMovie();
             app.MapCreateMovie();
             app.MapGetAllMovies();
-            //app.MapMovieEndPoints();
-            //app.MapRatingEndPoints();
+            app.MapUpdateMovie();
+            app.MapDeleteMovie();
+            
             return app;
         }
     }
