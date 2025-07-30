@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.OutputCaching;
+using Movies.Api.Auth;
 using Movies.Api.Mapping;
 using Movies.Application.Sevices;
 using Movies.Contracts.Requests;
@@ -23,7 +24,9 @@ namespace Movies.Api.EndPoints.Movies
                 var response = movie.MapToResponse();
                 return TypedResults.CreatedAtRoute(response, GetMovieEndpoint.Name, new { idOrSlug = movie.Id });
                 
-            });
+            })
+            .WithName(Name)
+            .RequireAuthorization(AuthConstants.TrustedMemberPolicyName);
             return app;
         }
     }

@@ -23,7 +23,8 @@ namespace Movies.Api.EndPoints.Movies
                 }
                 await outputCacheStore.EvictByTagAsync("movies", token);
                 return TypedResults.Ok();
-            }).WithName(Name);
+            }).WithName(Name)
+            .RequireAuthorization(AuthConstants.AdminUserPolicyName);
             return app;
         }
     }

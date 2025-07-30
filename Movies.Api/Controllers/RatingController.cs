@@ -7,7 +7,7 @@ using Movies.Api.Mapping;
 using Movies.Application.Sevices;
 using Movies.Contracts.Requests;
 using Movies.Contracts.Responses;
-
+/*
 namespace Movies.Api.Controllers
 {
     [ApiVersion(1.0)]
@@ -56,3 +56,4 @@ namespace Movies.Api.Controllers
 
     }
 }
+*/
