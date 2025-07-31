@@ -114,7 +114,7 @@ namespace Movies.Application.Repositories
                     select m.*, round(avg(r.rating),1) as rating, myr.rating as userrating 
                     from movies m
                     left join ratings r on m.id = r.movieid
-                    letf join ratings myr on m.id = myr.movieid
+                    left join ratings myr on m.id = myr.movieid
                     and myr.userid = @userId
                     where id=@id 
                     group by id, userrating
@@ -141,7 +141,7 @@ namespace Movies.Application.Repositories
                     select  m.*, round(avg(r.rating),1) as rating, myr.rating as userrating 
                     from movies m
                     left join ratings r on m.id = r.movieid
-                    letf join ratings myr on m.id = myr.movieid
+                    left join ratings myr on m.id = myr.movieid
                     and myr.userid = @userId
                     where slug=@slug
                     group by id, userrating
@@ -185,7 +185,7 @@ namespace Movies.Application.Repositories
             using var connection = await _dbConnectionFactory.CreateConnectionAsync(token);
             return await connection.QuerySingleAsync<int>(
               new CommandDefinition("""
-                  select count(id) form movies
+                  select count(id) from movies
                   where (@title is null or title like ('%' || @title || '%'))
                     and (@yearOfRelease is null or yearofrelease = @yearOfRelease)
                   """, new

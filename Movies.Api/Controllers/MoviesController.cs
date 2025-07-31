@@ -62,42 +62,42 @@ namespace Movies.Api.Controllers
             return Ok(reponse);
         }
 
-        [HttpGet(ApiEndPoints.Movies.Get)]
-        public async Task<IActionResult> GetV2([FromRoute] string idOrSlug,
-            [FromServices] LinkGenerator linkGenerator,
-            CancellationToken token)
-        {
-            var userId = HttpContext.GetUserId();
-            var movie = Guid.TryParse(idOrSlug.ToString(), out var id) ?
-                await _movieService.GetByIdAsync(id, userId, token)
-                : await _movieService.GetBySlugAsync(idOrSlug, userId, token);
+        //[HttpGet(ApiEndPoints.Movies.Get)]
+        //public async Task<IActionResult> GetV2([FromRoute] string idOrSlug,
+        //    [FromServices] LinkGenerator linkGenerator,
+        //    CancellationToken token)
+        //{
+        //    var userId = HttpContext.GetUserId();
+        //    var movie = Guid.TryParse(idOrSlug.ToString(), out var id) ?
+        //        await _movieService.GetByIdAsync(id, userId, token)
+        //        : await _movieService.GetBySlugAsync(idOrSlug, userId, token);
 
-            if (movie is null)
-            {
-                return NotFound();
-            }
-            var reponse = movie.MapToResponse();
-            var movieObj = new { id = movie.Id };
-            reponse.Links.Add(new Link
-            {
-                Href = linkGenerator.GetPathByAction(HttpContext, nameof(GetV1), values: new { idOrSlug = movie.Id }),
-                Rel = "self",
-                Type = "GET"
-            });
-            reponse.Links.Add(new Link
-            {
-                Href = linkGenerator.GetPathByAction(HttpContext, nameof(Update), values: new { idOrSlug = movie.Id }),
-                Rel = "self",
-                Type = "PUT"
-            });
-            reponse.Links.Add(new Link
-            {
-                Href = linkGenerator.GetPathByAction(HttpContext, nameof(Delete), values: new { idOrSlug = movie.Id }),
-                Rel = "self",
-                Type = "DELETE"
-            });
-            return Ok(reponse);
-        }
+        //    if (movie is null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    var reponse = movie.MapToResponse();
+        //    var movieObj = new { id = movie.Id };
+        //    reponse.Links.Add(new Link
+        //    {
+        //        Href = linkGenerator.GetPathByAction(HttpContext, nameof(GetV1), values: new { idOrSlug = movie.Id }),
+        //        Rel = "self",
+        //        Type = "GET"
+        //    });
+        //    reponse.Links.Add(new Link
+        //    {
+        //        Href = linkGenerator.GetPathByAction(HttpContext, nameof(Update), values: new { idOrSlug = movie.Id }),
+        //        Rel = "self",
+        //        Type = "PUT"
+        //    });
+        //    reponse.Links.Add(new Link
+        //    {
+        //        Href = linkGenerator.GetPathByAction(HttpContext, nameof(Delete), values: new { idOrSlug = movie.Id }),
+        //        Rel = "self",
+        //        Type = "DELETE"
+        //    });
+        //    return Ok(reponse);
+        //}
 
 
 
@@ -105,7 +105,7 @@ namespace Movies.Api.Controllers
         [HttpGet(ApiEndPoints.Movies.GetAll)]
         [OutputCache(PolicyName ="MovieCache")]
         //[ResponseCache(Duration = 30, VaryByQueryKeys =new[] { "title", "yearOfRelease", "sortBy", "page", "pageSize" }, VaryByHeader = "Accept, Accept-Encoding", Location = ResponseCacheLocation.Any)]
-        [Authorize(AuthConstants.TrustedMemberPolicyName)]
+        //[Authorize(AuthConstants.TrustedMemberPolicyName)]
         [ProducesResponseType(typeof(MovieResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllAsync(
             [FromQuery] GetAllMoviesRequest request,
